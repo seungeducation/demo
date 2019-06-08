@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds"
+	debug="false">
+	<!-- 定义日志文件 输入位置 -->
+	<property name="log_dir" value="/data/webroot/demo/logs" />
+	<!-- 日志最大的历史 15天 -->
+	<property name="maxHistory" value="30" />
+	<property name="pattern"
+		value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] %logger{30}.%method:%line [%X{reqKey}] - %msg%n" />
+
+
+	<!-- ConsoleAppender 控制台输出日志 -->
+	<appender name="STDOUT"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<!-- 对日志进行格式化 -->
+		<encoder>
+			<pattern>${pattern}</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="ERROR"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 过滤器，只记录ERROR级别以上的日志 -->
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
+		<file>${log_dir}/error.log</file>
+		<!-- 每日或者单个文件超过300M是生成一个新的日志文件，当日志文件超过50个时删除更早的文件 -->
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log_dir}/error_%d{yyyy-MM-dd}_%i.log
+			</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>300MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${pattern}</pattern>
+			<immediateFlush>true</immediateFlush>
+		</encoder>
+	</appender>
+
+	<appender name="INFO"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 记录info级别以上的日志 -->
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>INFO</level>
+		</filter>
+		<file>${log_dir}/info.log</file>
+		<!-- 每日或者单个文件超过300M是生成一个新的日志文件，当日志文件超过50个时删除更早的文件 -->
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log_dir}/info_%d{yyyy-MM-dd}_%i.log
+			</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>300MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${pattern}</pattern>
+			<immediateFlush>true</immediateFlush>
+		</encoder>
+	</appender>
+
+	<appender name="Sentry" class="com.getsentry.raven.logback.SentryAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+		<level>INFO</level>
+		</filter>
+		  <dsn>https://750132e87f624a74b3a9cdfd718c1d59:3a594a703d194771bc1f428f654fafa1@sentry.io/1316583</dsn>
+	</appender>
+	
+	<logger name="com" level="INFO" additivity="false">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="INFO" />
+		<appender-ref ref="ERROR" />	
+		<appender-ref ref="Sentry" />
+	</logger>
+
+
+
+	<logger name="org" level="INFO" additivity="false">
+	<appender-ref ref="STDOUT" />
+		<appender-ref ref="INFO" />
+		<appender-ref ref="ERROR" />
+		<appender-ref ref="Sentry" />  
+	</logger>
+
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="INFO" />
+		<appender-ref ref="ERROR" />		
+		<appender-ref ref="Sentry" />
+	</root>
+</configuration>
